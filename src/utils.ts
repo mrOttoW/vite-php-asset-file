@@ -9,10 +9,7 @@ function isString(src: any): src is string {
 function isArray<T>(src: any): src is Array<T> {
   return Array.isArray(src);
 }
-export function merge<
-  T extends Record<string, any>,
-  U extends Record<string, any>,
->(src: T, target: U): T & U {
+export function merge<T extends Record<string, any>, U extends Record<string, any>>(src: T, target: U): T & U {
   const deepClone = (src: unknown): unknown => {
     if (typeof src !== 'object' || src === null || isRegex(src)) {
       return src;
