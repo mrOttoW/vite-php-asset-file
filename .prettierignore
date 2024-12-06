@@ -6,3 +6,4 @@ reports
 tar
 pnpm-lock.yaml
 renovate.json5
+yarn.lock

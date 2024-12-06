@@ -214,7 +214,6 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
   return {
     name: VITE_PLUGIN_NAME,
     enforce: 'post',
-    apply: 'build',
 
     /**
      * Generate Bundle Hook.
