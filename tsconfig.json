@@ -11,11 +11,7 @@
     "outDir": "dist",
     "lib": ["ESNext"],
     "skipLibCheck": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/pkg-types",
-      "./types"
-    ]
+    "typeRoots": ["./node_modules/@types", "./node_modules/pkg-types", "./types"]
   },
   "include": ["src/index.ts"]
 }

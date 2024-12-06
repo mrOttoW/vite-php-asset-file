@@ -1,6 +1,6 @@
 // eslint.config.js
-import js from "@eslint/js";
-import globals from "globals";
+import js from '@eslint/js';
+import globals from 'globals';
 
 export default [
   {
@@ -11,26 +11,16 @@ export default [
         ...globals.jquery,
         ...globals.node,
       },
-    }
+    },
   },
   {
-    ignores: [
-      "tests/**",
-      "node_modules/**",
-      "dist/**",
-      ".idea/**",
-      ".vscode/**",
-      "reports/**",
-      "tar/**",
-      "!**/*.js",
-      "!**/*.ts"
-    ]
+    ignores: ['tests/**', 'node_modules/**', 'dist/**', '.idea/**', '.vscode/**', 'reports/**', 'tar/**', '!**/*.js', '!**/*.ts'],
   },
   js.configs.recommended,
   {
     rules: {
-      "no-unused-vars": "error",
-      "no-undef": "error"
+      'no-unused-vars': 'error',
+      'no-undef': 'error',
     },
-  }
-]
+  },
+];

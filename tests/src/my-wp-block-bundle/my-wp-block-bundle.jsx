@@ -6,11 +6,7 @@ const { __ } = wp.i18n;
 const { useBlockProps } = wp.blockEditor;
 
 export default function Edit() {
-  return (
-    <p {...useBlockProps()}>
-      {__('Example Block – hello from the editor!', 'my-wp-block')}
-    </p>
-  );
+  return <p {...useBlockProps()}>{__('Example Block – hello from the editor!', 'my-wp-block')}</p>;
 }
 
 registerBlockType(metadata.name, {

@@ -1,17 +1,11 @@
 import { DEFAULT_OPTIONS, VITE_PLUGIN_NAME } from './constants';
 import type { Plugin } from 'vite';
-import {
-  GlobalsOption,
-  NormalizedOutputOptions,
-  OutputBundle,
-  OutputChunk,
-  PluginContext,
-} from 'rollup';
+import { GlobalsOption, NormalizedOutputOptions, OutputBundle, OutputChunk, PluginContext } from 'rollup';
 import { merge } from './utils';
 import { createHash } from 'crypto';
 import fs from 'fs';
 import json2php from 'json2php';
-import acorn, { Options as AcornOptions, Node } from 'acorn';
+import { parse, Node, Options as AcornOptions } from 'acorn';
 
 interface Options {
   linebreak?: string;
@@ -42,24 +36,16 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param globals
    * @param usedGlobals
    */
-  const findGlobalsUsage = (
-    code: string,
-    globals: GlobalsOption,
-    usedGlobals: string[] = []
-  ): string[] => {
+  const findGlobalsUsage = (code: string, globals: GlobalsOption, usedGlobals: string[] = []): string[] => {
     const traverse = (node: Node | any) => {
       // Check for variable declarations
       if (node.type === 'VariableDeclaration') {
         node.declarations.forEach(declaration => {
-          if (
-            declaration.init &&
-            declaration.init.type === 'MemberExpression'
-          ) {
+          if (declaration.init && declaration.init.type === 'MemberExpression') {
             const globalKey = Object.keys(globals).find(
               key =>
                 globals[key] === declaration.init.object.name ||
-                globals[key] ===
-                  `${declaration.init.object.name}.${declaration.init.property.name}`
+                globals[key] === `${declaration.init.object.name}.${declaration.init.property.name}`
             );
 
             if (globalKey && !usedGlobals.includes(globalKey)) {
@@ -74,8 +60,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
         if (node.object && node.object.name) {
           for (let key in globals) {
             if (
-              (globals[key] === node.object.name ||
-                globals[key] === `${node.object.name}.${node.property.name}`) &&
+              (globals[key] === node.object.name || globals[key] === `${node.object.name}.${node.property.name}`) &&
               !usedGlobals.includes(key)
             ) {
               usedGlobals.push(key);
@@ -92,7 +77,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
       }
     };
 
-    traverse(acorn.parse(code, options.acornOptions));
+    traverse(parse(code, options.acornOptions));
 
     return usedGlobals;
   };
@@ -103,10 +88,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param module
    * @param globals
    */
-  const createDependencyArray = (
-    module: OutputChunk,
-    globals: GlobalsOption
-  ): string[] => {
+  const createDependencyArray = (module: OutputChunk, globals: GlobalsOption): string[] => {
     const dependencies = [
       ...(typeof options.dependencies === 'function'
         ? options.dependencies(module)
@@ -133,10 +115,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param module
    * @param assets
    */
-  const createImportedAssetsList = (
-    module: OutputChunk,
-    assets: string[] = []
-  ) => {
+  const createImportedAssetsList = (module: OutputChunk, assets: string[] = []) => {
     if (module.viteMetadata && module.viteMetadata.importedCss) {
       module.viteMetadata.importedCss.forEach(function (value) {
         if (options.cssExtensions.some(ext => value.endsWith(ext))) {
@@ -157,10 +136,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
     const hash = createHash(options.hashAlgorithm);
 
     for (const moduleId of module.moduleIds) {
-      if (
-        options.cssExtensions.some(ext => moduleId.endsWith(ext)) ||
-        options.jsExtensions.some(ext => moduleId.endsWith(ext))
-      ) {
+      if (options.cssExtensions.some(ext => moduleId.endsWith(ext)) || options.jsExtensions.some(ext => moduleId.endsWith(ext))) {
         hash.update(fs.readFileSync(moduleId));
       }
     }
@@ -179,9 +155,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
         return filename.slice(0, -ext.length) + '.asset.php';
       }
     }
-    throw new Error(
-      `VitePhpAssetFile: No matching extension found for file: ${filename}`
-    );
+    throw new Error(`VitePhpAssetFile: No matching extension found for file: ${filename}`);
   };
 
   /**
@@ -191,11 +165,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param bundleOptions
    * @param module
    */
-  const createPhpAssetFile = (
-    plugin: PluginContext,
-    bundleOptions: NormalizedOutputOptions,
-    module: OutputChunk
-  ) => {
+  const createPhpAssetFile = (plugin: PluginContext, bundleOptions: NormalizedOutputOptions, module: OutputChunk) => {
     if (!bundleOptions.dir || !module.facadeModuleId) {
       return;
     }
@@ -233,16 +203,9 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
      * @param bundleOptions
      * @param bundle
      */
-    async generateBundle(
-      bundleOptions: NormalizedOutputOptions,
-      bundle: OutputBundle
-    ) {
+    async generateBundle(bundleOptions: NormalizedOutputOptions, bundle: OutputBundle) {
       for (let module of Object.values(bundle)) {
-        if (
-          module.type === 'chunk' &&
-          options.jsExtensions &&
-          options.jsExtensions.some(ext => module.facadeModuleId!.endsWith(ext))
-        ) {
+        if (module.type === 'chunk' && options.jsExtensions && options.jsExtensions.some(ext => module.facadeModuleId!.endsWith(ext))) {
           createPhpAssetFile(this, bundleOptions, module);
         }
       }

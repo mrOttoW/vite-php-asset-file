@@ -35,11 +35,8 @@ with default options
 import { VitePhpAssetFile } from 'vite-php-asset-file';
 
 export default {
-  plugins: [
-    VitePhpAssetFile(),
-  ],
+  plugins: [VitePhpAssetFile()],
 };
-
 ```
 
 With options
@@ -68,19 +65,18 @@ export default {
 
 The following options are available to configure the plugin:
 
-| Option              | Type                                           | Default Value                                  | Description                                                                                                   |
-|---------------------|------------------------------------------------|------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| `linebreak`         | `string`                                       | `''`                                           | Defines the line break character for the PHP output.                                                          |
-| `indent`            | `string`                                       | `''`                                           | Defines the indentation style for the PHP output.                                                             |
-| `shortArraySyntax`  | `boolean`                                      | `false`                                        | If `true`, uses PHP short array syntax `[]` instead of `array()`.                                             |
-| `includeGlobals`    | `boolean`                                      | `true`                                         | If `true`, includes globally defined dependencies in the asset file (uses globals config from rollupOptions). |
-| `dependencies`      | `string[]` or `function(module)`               | `[]`                                           | List of dependencies to include, or a function that returns dependencies based on module.                     |
-| `jsExtensions`      | `string[]`                                     | `['.js', '.ts', '.jsx', '.tsx']`               | List of JavaScript file extensions to consider for generating PHP asset files.                                |
-| `cssExtensions`     | `string[]`                                     | `['.css', '.pcss', '.scss', '.sass', '.less']` | List of CSS file extensions to consider for generating PHP asset files.                                       |
-| `hashAlgorithm`     | `string`                                       | `'sha256'`                                     | The hashing algorithm used to generate the version hash for each asset.                                       |
-| `hashMaxLength`     | `number`                                       | `20`                                           | The maximum length of the generated hash.                                                                     |
-| `acornOptions`      | `AcornOptions`                                 | `{ ecmaVersion: 2020, sourceType: 'module' }`                        | Options for parsing JavaScript code with Acorn (used for finding global variable usage).                      |
-
+| Option             | Type                             | Default Value                                  | Description                                                                                                   |
+| ------------------ | -------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `linebreak`        | `string`                         | `''`                                           | Defines the line break character for the PHP output.                                                          |
+| `indent`           | `string`                         | `''`                                           | Defines the indentation style for the PHP output.                                                             |
+| `shortArraySyntax` | `boolean`                        | `false`                                        | If `true`, uses PHP short array syntax `[]` instead of `array()`.                                             |
+| `includeGlobals`   | `boolean`                        | `true`                                         | If `true`, includes globally defined dependencies in the asset file (uses globals config from rollupOptions). |
+| `dependencies`     | `string[]` or `function(module)` | `[]`                                           | List of dependencies to include, or a function that returns dependencies based on module.                     |
+| `jsExtensions`     | `string[]`                       | `['.js', '.ts', '.jsx', '.tsx']`               | List of JavaScript file extensions to consider for generating PHP asset files.                                |
+| `cssExtensions`    | `string[]`                       | `['.css', '.pcss', '.scss', '.sass', '.less']` | List of CSS file extensions to consider for generating PHP asset files.                                       |
+| `hashAlgorithm`    | `string`                         | `'sha256'`                                     | The hashing algorithm used to generate the version hash for each asset.                                       |
+| `hashMaxLength`    | `number`                         | `20`                                           | The maximum length of the generated hash.                                                                     |
+| `acornOptions`     | `AcornOptions`                   | `{ ecmaVersion: 2020, sourceType: 'module' }`  | Options for parsing JavaScript code with Acorn (used for finding global variable usage).                      |
 
 ## How It Works
 
@@ -88,7 +84,6 @@ The following options are available to configure the plugin:
 - It finds globally used variables and modules in the code and includes them as dependencies in the generated PHP asset file.
 - It generates a hash based on the content of the relevant JavaScript and CSS files to version the assets.
 - It creates a PHP asset file (`.asset.php`) containing the dependencies, version hash, and imported assets list, which can be used in your PHP application.
-
 
 ### Example PHP Output
 

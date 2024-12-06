@@ -8,8 +8,7 @@ describe('Test expected generated asset files & contents', () => {
   const isDist = process.env.NODE_ENV === 'dist';
   const bundles = ['jquery', 'lodash', 'react', 'wp-block'];
 
-  const getAssetFilePath = bundle =>
-    path.join(buildDir, `${bundle}-bundle.asset.php`);
+  const getAssetFilePath = bundle => path.join(buildDir, `${bundle}-bundle.asset.php`);
   const getAssetFileContent = () => {
     const fileContent = {};
 
@@ -36,18 +35,10 @@ describe('Test expected generated asset files & contents', () => {
   it('should create dependency array including globals', () => {
     const fileContent = getAssetFileContent();
 
-    expect(fileContent['jquery']).toContain(
-      `'dependencies' => array('jquery')`
-    );
-    expect(fileContent['lodash']).toContain(
-      `'dependencies' => array('lodash')`
-    );
-    expect(fileContent['react']).toContain(
-      `'dependencies' => array('react', 'react-dom')`
-    );
-    expect(fileContent['wp-block']).toContain(
-      `'dependencies' => array('wp-blocks', 'wp-i18n', 'wp-block-editor', 'react')`
-    );
+    expect(fileContent['jquery']).toContain(`'dependencies' => array('jquery')`);
+    expect(fileContent['lodash']).toContain(`'dependencies' => array('lodash')`);
+    expect(fileContent['react']).toContain(`'dependencies' => array('react', 'react-dom')`);
+    expect(fileContent['wp-block']).toContain(`'dependencies' => array('wp-blocks', 'wp-i18n', 'wp-block-editor', 'react')`);
   });
 
   it('should generate hash version correctly', () => {
@@ -64,16 +55,10 @@ describe('Test expected generated asset files & contents', () => {
   it('should create imported CSS assets list correctly', () => {
     const fileContent = getAssetFileContent();
 
-    expect(fileContent['jquery']).toContain(
-      `'assets' => array('jquery-bundle.css')`
-    );
+    expect(fileContent['jquery']).toContain(`'assets' => array('jquery-bundle.css')`);
     expect(fileContent['lodash']).toContain(`'assets' => array()`);
-    expect(fileContent['react']).toContain(
-      `'assets' => array('react-bundle.css'`
-    );
-    expect(fileContent['wp-block']).toContain(
-      `'assets' => array('wp-block-bundle.css')`
-    );
+    expect(fileContent['react']).toContain(`'assets' => array('react-bundle.css'`);
+    expect(fileContent['wp-block']).toContain(`'assets' => array('wp-block-bundle.css')`);
   });
 
   afterAll(() => {
