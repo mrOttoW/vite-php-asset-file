@@ -1,6 +1,6 @@
 {
   "name": "vite-php-asset-file",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A simple Vite 6+ plugin to produce a php file that returns an array with hash of each build to 'version' your asset files for cache-busting, a dependency list based on configured externals and a list of imported CSS assets.",
   "files": [
     "dist/"
@@ -28,7 +28,7 @@
     "prettier-check": "prettier --log-level warn --cache --cache-strategy content --cache-location ./node_modules/.cache/.prettiercache --check .",
     "prettier-fix": "prettier --log-level warn --cache --cache-strategy content --cache-location ./node_modules/.cache/.prettiercache --write .",
     "eslint-check": "eslint --max-warnings=25 --format=pretty --cache --cache-strategy content --cache-location ./node_modules/.cache/.eslintcache '{**/*,*}.{js,ts}'",
-    "eslint-fix": "pnpm eslint-check --fix",
+    "eslint-fix": "yarn eslint-check --fix",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
