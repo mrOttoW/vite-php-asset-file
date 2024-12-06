@@ -5,7 +5,7 @@ import { merge } from './utils';
 import { createHash } from 'crypto';
 import fs from 'fs';
 import json2php from 'json2php';
-import { parse, Node, Options as AcornOptions } from 'acorn';
+import { parse, Node, Options as AcornOptions, Expression, SpreadElement } from 'acorn';
 
 interface Options {
   linebreak?: string;
@@ -38,7 +38,32 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    */
   const findGlobalsUsage = (code: string, globals: GlobalsOption, usedGlobals: string[] = []): string[] => {
     const traverse = (node: Node | any) => {
-      // Check for variable declarations
+      const addGlobalKey = (key: string | undefined) => {
+        if (key && !usedGlobals.includes(key)) {
+          usedGlobals.push(key);
+        }
+      };
+
+      // Check for call expressions.
+      if (node.type === 'CallExpression') {
+        node.arguments.forEach((argument: Expression | SpreadElement) => {
+          if ('name' in argument && argument.name) {
+            const globalKey = Object.keys(globals).find(key => globals[key] === argument.name);
+            addGlobalKey(globalKey);
+          }
+        });
+      }
+
+      // Check for function parameters.
+      if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') {
+        node.params.forEach(param => {
+          if (Object.values(globals).includes(param.name)) {
+            addGlobalKey(param.name);
+          }
+        });
+      }
+
+      // Check for variable declarations.
       if (node.type === 'VariableDeclaration') {
         node.declarations.forEach(declaration => {
           if (declaration.init && declaration.init.type === 'MemberExpression') {
@@ -47,29 +72,23 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
                 globals[key] === declaration.init.object.name ||
                 globals[key] === `${declaration.init.object.name}.${declaration.init.property.name}`
             );
-
-            if (globalKey && !usedGlobals.includes(globalKey)) {
-              usedGlobals.push(globalKey);
-            }
+            addGlobalKey(globalKey);
           }
         });
       }
 
-      // Check for any MemberExpression nodes
+      // Check for any MemberExpression nodes.
       if (node.type === 'MemberExpression') {
         if (node.object && node.object.name) {
           for (let key in globals) {
-            if (
-              (globals[key] === node.object.name || globals[key] === `${node.object.name}.${node.property.name}`) &&
-              !usedGlobals.includes(key)
-            ) {
-              usedGlobals.push(key);
+            if (globals[key] === node.object.name || globals[key] === `${node.object.name}.${node.property.name}`) {
+              addGlobalKey(key);
             }
           }
         }
       }
 
-      // Recursively traverse all child nodes
+      // Recursively traverse all child nodes.
       for (const key in node) {
         if (node[key] && typeof node[key] === 'object') {
           traverse(node[key]);

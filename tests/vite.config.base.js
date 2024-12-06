@@ -1,7 +1,7 @@
 import path from 'path';
 
 const globals = {
-  jquery: '$',
+  jquery: 'jQuery',
   lodash: '_',
   react: 'React',
   'react-dom': 'ReactDOM',
