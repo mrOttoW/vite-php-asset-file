@@ -18,13 +18,13 @@ This serves as an alternative to using a manifest file in a PHP environment.
 To use the `VitePhpAssetFile` plugin, install it via npm:
 
 ```bash
-npm install --save-dev @mrotto/vite-php-asset-file
+npm install --save-dev vite-php-asset-file
 ```
 
 Or with yarn:
 
 ```bash
-yarn add -D @mrotto/vite-php-asset-file
+yarn add -D vite-php-asset-file
 ```
 
 ## Usage
