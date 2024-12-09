@@ -194,9 +194,9 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
       return;
     }
     const phpPrinter = json2php.make({
-      linebreak: '',
-      indent: '',
-      shortArraySyntax: false,
+      linebreak: options.linebreak,
+      indent: options.indent,
+      shortArraySyntax: options.shortArraySyntax,
     });
     const dependencies = createDependencyArray(module, bundleOptions.globals);
     const version = createHashVersion(module);
