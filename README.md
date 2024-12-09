@@ -16,9 +16,10 @@ CSS assets. This serves as an alternative to using a manifest file in a PHP envi
 
 ## Features
 
-- Generates PHP asset files with dependencies, version hash, and imported css assets.
-- Supports custom file extensions for JavaScript and CSS files.
-- Supports generating dependencies based on global variable usage in the code.
+- Generates PHP asset files with dependencies, (configurable) version hash, and imported css assets.
+  - The version hash is generated based on changes in the JavaScript file and all its imported CSS assets.
+  - Dependencies are generated based on global variable usage in the code.
+- Supports different file extensions for JavaScript and CSS files.
 - Configurable options for output formatting, hash algorithm, and asset extensions.
 - Integrates easily with Vite's build process.
 
