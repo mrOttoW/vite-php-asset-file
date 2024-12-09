@@ -1,11 +1,12 @@
 import { DEFAULT_OPTIONS, VITE_PLUGIN_NAME } from './constants';
 import type { Plugin } from 'vite';
 import { GlobalsOption, NormalizedOutputOptions, OutputBundle, OutputChunk, PluginContext } from 'rollup';
+import { parse, Node, Options as AcornOptions, Expression, SpreadElement } from 'acorn';
 import { merge } from './utils';
 import { createHash } from 'crypto';
 import fs from 'fs';
 import json2php from 'json2php';
-import { parse, Node, Options as AcornOptions, Expression, SpreadElement } from 'acorn';
+import path from 'path';
 
 interface Options {
   linebreak?: string;
@@ -134,11 +135,12 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param module
    * @param assets
    */
-  const createImportedAssetsList = (module: OutputChunk, assets: string[] = []) => {
+  const createImportedAssetsList = (module: OutputChunk, assets: { [key: string]: string } = {}) => {
     if (module.viteMetadata && module.viteMetadata.importedCss) {
-      module.viteMetadata.importedCss.forEach(function (value) {
-        if (options.cssExtensions.some(ext => value.endsWith(ext))) {
-          assets.push(value);
+      module.viteMetadata.importedCss.forEach(function (filePath) {
+        if (options.cssExtensions.some(ext => filePath.endsWith(ext))) {
+          const fileName = path.basename(filePath, path.extname(filePath));
+          assets[fileName] = filePath;
         }
       });
     }

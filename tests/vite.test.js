@@ -55,10 +55,10 @@ describe('Test expected generated asset files & contents', () => {
   it('should create imported CSS assets list correctly', () => {
     const fileContent = getAssetFileContent();
 
-    expect(fileContent['jquery']).toContain(`'assets' => array('jquery-bundle.css')`);
+    expect(fileContent['jquery']).toContain(`'assets' => array('jquery-bundle' => 'jquery-bundle.css')`);
     expect(fileContent['lodash']).toContain(`'assets' => array()`);
-    expect(fileContent['react']).toContain(`'assets' => array('react-bundle.css'`);
-    expect(fileContent['wp-block']).toContain(`'assets' => array('wp-block-bundle.css')`);
+    expect(fileContent['react']).toContain(`'assets' => array('react-bundle' => 'react-bundle.css'`);
+    expect(fileContent['wp-block']).toContain(`'assets' => array('wp-block-bundle' => 'wp-block-bundle.css')`);
   });
 
   afterAll(() => {
