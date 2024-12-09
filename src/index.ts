@@ -16,8 +16,10 @@ interface Options {
   dependencies?: string[] | ((module: OutputChunk) => string[]);
   jsExtensions?: string[];
   cssExtensions?: string[];
+  cssNamePrefix?: string;
   hashAlgorithm?: string;
   hashMaxLength?: number;
+  includeCssAsDeps?: boolean;
   acornOptions?: AcornOptions;
 }
 
@@ -140,7 +142,8 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
       module.viteMetadata.importedCss.forEach(function (filePath) {
         if (options.cssExtensions.some(ext => filePath.endsWith(ext))) {
           const fileName = path.basename(filePath, path.extname(filePath));
-          assets[fileName] = filePath;
+          const prefixedFileName = options.cssNamePrefix ? `${options.cssNamePrefix}-${fileName}` : fileName;
+          assets[prefixedFileName] = filePath;
         }
       });
     }
@@ -195,18 +198,20 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
       indent: '',
       shortArraySyntax: false,
     });
+    const dependencies = createDependencyArray(module, bundleOptions.globals);
+    const version = createHashVersion(module);
+    const assets = createImportedAssetsList(module);
+
+    if (options.includeCssAsDeps) {
+      Object.entries(assets).forEach(([cssFileName, cssFilePath]) => {
+        dependencies.push(cssFileName);
+      });
+    }
 
     plugin.emitFile({
       type: 'asset',
       fileName: createPhpAssetFileName(module.fileName),
-      source:
-        '<?php return ' +
-        phpPrinter({
-          dependencies: createDependencyArray(module, bundleOptions.globals),
-          version: createHashVersion(module),
-          assets: createImportedAssetsList(module),
-        }) +
-        ';',
+      source: '<?php return ' + phpPrinter({ dependencies, version, assets }) + ';',
     });
   };
 

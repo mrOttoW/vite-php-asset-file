@@ -7,6 +7,8 @@ export const DEFAULT_OPTIONS = {
   dependencies: [],
   jsExtensions: ['.js', '.ts', '.jsx', '.tsx'],
   cssExtensions: ['.css', '.pcss', '.scss', '.sass', '.less'],
+  cssNamePrefix: '',
+  includeCssAsDeps: false,
   hashAlgorithm: 'sha256',
   hashMaxLength: 20,
   acornOptions: { ecmaVersion: 2020, sourceType: 'module' },
