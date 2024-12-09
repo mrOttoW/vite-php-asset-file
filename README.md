@@ -100,5 +100,5 @@ The following options are available to configure the plugin:
 For a JavaScript file `react-bundle.js` with imported CSS files, the plugin will generate a PHP asset file like the following:
 
 ```php
-<?php return array('dependencies' => array('react', 'react-dom'), 'version' => '00472e96f3e2edf6bdc4', 'assets' => array('react-bundle.css'));
+<?php return array('dependencies' => array('react', 'react-dom'), 'version' => '00472e96f3e2edf6bdc4', 'assets' => array('react-bundle' => 'react-bundle.css'));
 ```
