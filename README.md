@@ -1,9 +1,18 @@
-# Vite PHP Asset File for Vite 6+
-
+<div align="center">
+  <a href="https://vitejs.dev/">
+    <img width="200" height="200" hspace="10" src="vite-logo.svg" alt="vite logo" />
+  </a>
+  <h1>️Vite PHP Asset File for Vite 6+</h1>
+  <p>
 A simple Vite plugin to produce a php file that returns an array with hash of each build to 'version' your asset files for cache-busting, a dependency list derived from globals and a list of imported
-CSS assets.
-
-This serves as an alternative to using a manifest file in a PHP environment.
+CSS assets. This serves as an alternative to using a manifest file in a PHP environment.
+</p>
+  <img src="https://img.shields.io/github/v/release/mrOttoW/vite-php-asset-file" alt="GitHub release" />
+  <img src="https://img.shields.io/npm/dependency-version/vite-php-asset-file/peer/vite" alt="npm peer dependency version" />
+  <img alt="Node Current" src="https://img.shields.io/node/v/vite-php-asset-file">
+  <img src="https://img.shields.io/github/last-commit/mrOttoW/vite-php-asset-file" alt="GitHub last commit"/>
+  <img src="https://img.shields.io/npm/l/vite-php-asset-file" alt="licence" />
+</div>
 
 ## Features
 
