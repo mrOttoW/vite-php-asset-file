@@ -31,6 +31,7 @@ interface Options {
  */
 function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
   const options: Options = merge(optionsParam, DEFAULT_OPTIONS);
+  const something = '';
 
   /**
    * Find globals usage in code.
