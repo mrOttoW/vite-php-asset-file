@@ -1,7 +1,19 @@
 import { DEFAULT_OPTIONS, VITE_PLUGIN_NAME } from './constants';
 import type { Plugin } from 'vite';
 import { GlobalsOption, NormalizedOutputOptions, OutputBundle, OutputChunk, PluginContext } from 'rollup';
-import { parse, Node, Options as AcornOptions, Expression, SpreadElement } from 'acorn';
+import {
+  parse,
+  Node,
+  Options as AcornOptions,
+  Expression,
+  SpreadElement,
+  MemberExpression,
+  CallExpression,
+  VariableDeclaration,
+  VariableDeclarator,
+  Function,
+  Pattern,
+} from 'acorn';
 import { merge } from './utils';
 import { createHash } from 'crypto';
 import fs from 'fs';
@@ -13,7 +25,7 @@ interface Options {
   indent?: string;
   shortArraySyntax?: boolean;
   includeGlobals?: boolean;
-  dependencies?: string[] | ((module: OutputChunk) => string[]);
+  dependencies?: string[] | ((module: OutputChunk) => string[]); // eslint-disable-line no-unused-vars
   jsExtensions?: string[];
   cssExtensions?: string[];
   cssNamePrefix?: string;
@@ -31,7 +43,6 @@ interface Options {
  */
 function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
   const options: Options = merge(optionsParam, DEFAULT_OPTIONS);
-  const something = '';
 
   /**
    * Find globals usage in code.
@@ -41,7 +52,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param usedGlobals
    */
   const findGlobalsUsage = (code: string, globals: GlobalsOption, usedGlobals: string[] = []): string[] => {
-    const traverse = (node: Node | any) => {
+    const traverse = (node: Node) => {
       const addGlobalKey = (key: string | undefined) => {
         if (key && !usedGlobals.includes(key)) {
           usedGlobals.push(key);
@@ -50,7 +61,9 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
 
       // Check for call expressions.
       if (node.type === 'CallExpression') {
-        node.arguments.forEach((argument: Expression | SpreadElement) => {
+        const callExpression: CallExpression = node as CallExpression;
+
+        callExpression.arguments.forEach((argument: Expression | SpreadElement) => {
           if ('name' in argument && argument.name) {
             const globalKey = Object.keys(globals).find(key => globals[key] === argument.name);
             addGlobalKey(globalKey);
@@ -60,8 +73,10 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
 
       // Check for function parameters.
       if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') {
-        node.params.forEach(param => {
-          if (Object.values(globals).includes(param.name)) {
+        const functionNode: Function = node as Function;
+
+        functionNode.params.forEach((param: Pattern) => {
+          if ('name' in param && Object.values(globals).includes(param.name)) {
             addGlobalKey(param.name);
           }
         });
@@ -69,23 +84,23 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
 
       // Check for variable declarations.
       if (node.type === 'VariableDeclaration') {
-        node.declarations.forEach(declaration => {
+        (node as VariableDeclaration).declarations.forEach((declaration: VariableDeclarator) => {
           if (declaration.init && declaration.init.type === 'MemberExpression') {
-            const globalKey = Object.keys(globals).find(
-              key =>
-                globals[key] === declaration.init.object.name ||
-                globals[key] === `${declaration.init.object.name}.${declaration.init.property.name}`
-            );
-            addGlobalKey(globalKey);
+            traverse(declaration.init);
           }
         });
       }
 
       // Check for any MemberExpression nodes.
       if (node.type === 'MemberExpression') {
-        if (node.object && node.object.name) {
-          for (let key in globals) {
-            if (globals[key] === node.object.name || globals[key] === `${node.object.name}.${node.property.name}`) {
+        const memberExpression: MemberExpression = node as MemberExpression;
+
+        if (memberExpression.object && 'name' in memberExpression.object) {
+          for (const key in globals) {
+            if (
+              globals[key] === memberExpression.object.name ||
+              ('name' in memberExpression.property && globals[key] === `${memberExpression.object.name}.${memberExpression.property.name}`)
+            ) {
               addGlobalKey(key);
             }
           }
@@ -138,7 +153,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param module
    * @param assets
    */
-  const createImportedAssetsList = (module: OutputChunk, assets: { [key: string]: string } = {}) => {
+  const createImportedAssetsList = (module: OutputChunk, assets: Record<string, string> = {}) => {
     if (module.viteMetadata && module.viteMetadata.importedCss) {
       module.viteMetadata.importedCss.forEach(function (filePath) {
         if (options.cssExtensions.some(ext => filePath.endsWith(ext))) {
@@ -175,7 +190,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param filename
    */
   const createPhpAssetFileName = (filename: string) => {
-    for (let ext of options.jsExtensions) {
+    for (const ext of options.jsExtensions) {
       if (filename.endsWith(ext)) {
         return filename.slice(0, -ext.length) + '.asset.php';
       }
@@ -204,7 +219,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
     const assets = createImportedAssetsList(module);
 
     if (options.includeCssAsDeps) {
-      Object.entries(assets).forEach(([cssFileName, cssFilePath]) => {
+      Object.entries(assets).forEach(([cssFileName]) => {
         dependencies.push(cssFileName);
       });
     }
@@ -230,7 +245,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
      * @param bundle
      */
     async generateBundle(bundleOptions: NormalizedOutputOptions, bundle: OutputBundle) {
-      for (let module of Object.values(bundle)) {
+      for (const module of Object.values(bundle)) {
         if (module.type === 'chunk' && options.jsExtensions && options.jsExtensions.some(ext => module.facadeModuleId!.endsWith(ext))) {
           createPhpAssetFile(this, bundleOptions, module);
         }
