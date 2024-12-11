@@ -2,7 +2,7 @@
   <a href="https://vitejs.dev/">
     <img width="200" height="200" hspace="10" src="vite-logo.svg" alt="vite logo" />
   </a>
-  <h1>️Vite PHP Asset File for Vite 6+</h1>
+  <h1>️Vite PHP Asset File for Vite 6</h1>
   <p>
 A simple Vite plugin to produce a php file that returns an array with hash of each build to 'version' your asset files for cache-busting, a dependency list derived from globals and a list of imported
 CSS assets. This serves as an alternative to using a manifest file in a PHP environment.

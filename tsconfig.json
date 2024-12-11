@@ -10,8 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "outDir": "dist",
     "lib": ["ESNext"],
-    "skipLibCheck": true,
-    "typeRoots": ["./node_modules/@types", "./node_modules/pkg-types", "./types"]
+    "skipLibCheck": true
   },
   "include": ["src/index.ts"]
 }
