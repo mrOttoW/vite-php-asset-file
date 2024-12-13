@@ -11,7 +11,7 @@ const globals = {
 };
 
 export const config = {
-  root: `tests`,
+  root: `playground`,
   build: {
     outDir: 'build',
     rollupOptions: {

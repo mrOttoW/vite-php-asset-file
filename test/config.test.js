@@ -4,7 +4,7 @@ import path from 'path';
 
 describe('Test expected generated asset files & contents', () => {
   const rootDir = path.resolve(__dirname, '../'); // Root directory of the project
-  const buildDir = path.join(rootDir, 'tests/build'); // Build output directory
+  const buildDir = path.join(rootDir, 'playground/build'); // Build output directory
   const isDist = process.env.NODE_ENV === 'dist';
   const bundles = ['jquery', 'lodash', 'react', 'wp-block'];
 
@@ -20,7 +20,7 @@ describe('Test expected generated asset files & contents', () => {
   };
 
   beforeAll(() => {
-    execSync(isDist ? 'yarn test-build-dist' : 'yarn test-build', {
+    execSync(isDist ? 'yarn playground-build-dist' : 'yarn playground-build', {
       cwd: rootDir,
       stdio: 'inherit',
     });
