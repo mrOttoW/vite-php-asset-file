@@ -12,4 +12,5 @@ export const DEFAULT_OPTIONS = {
   hashAlgorithm: 'sha256',
   hashMaxLength: 20,
   acornOptions: { ecmaVersion: 2020, sourceType: 'module' },
+  debug: false,
 };

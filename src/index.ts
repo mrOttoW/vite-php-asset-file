@@ -1,5 +1,5 @@
 import { DEFAULT_OPTIONS, VITE_PLUGIN_NAME } from './constants';
-import type { Plugin } from 'vite';
+import type { Plugin, ResolvedConfig } from 'vite';
 import { GlobalsOption, NormalizedOutputOptions, OutputBundle, OutputChunk, PluginContext } from 'rollup';
 import {
   parse,
@@ -13,6 +13,7 @@ import {
   VariableDeclarator,
   Function,
   Pattern,
+  Identifier,
 } from 'acorn';
 import { merge } from './utils';
 import { createHash } from 'crypto';
@@ -33,6 +34,7 @@ interface Options {
   hashMaxLength?: number;
   includeCssAsDeps?: boolean;
   acornOptions?: AcornOptions;
+  debug?: boolean;
 }
 
 /**
@@ -43,6 +45,19 @@ interface Options {
  */
 function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
   const options: Options = merge(optionsParam, DEFAULT_OPTIONS);
+  let rootConfig: ResolvedConfig;
+  let scanningFile: string;
+
+  /**
+   * Log message.
+   *
+   * @param msg
+   */
+  const log = (msg: string) => {
+    if (options.debug) {
+      rootConfig.logger.info(`${VITE_PLUGIN_NAME}: ${msg}`, { timestamp: true });
+    }
+  };
 
   /**
    * Find globals usage in code.
@@ -53,11 +68,21 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    */
   const findGlobalsUsage = (code: string, globals: GlobalsOption, usedGlobals: string[] = []): string[] => {
     const traverse = (node: Node) => {
+      const getGlobalKey = (value: string) => Object.keys(globals).find(key => globals[key] === value);
       const addGlobalKey = (key: string | undefined) => {
         if (key && !usedGlobals.includes(key)) {
           usedGlobals.push(key);
         }
       };
+
+      // Check for identifier nodes.
+      if (node.type === 'Identifier') {
+        const identifierNode: Identifier = node as Identifier;
+
+        if (Object.values(globals).includes(identifierNode.name)) {
+          addGlobalKey(getGlobalKey(identifierNode.name));
+        }
+      }
 
       // Check for call expressions.
       if (node.type === 'CallExpression') {
@@ -65,8 +90,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
 
         callExpression.arguments.forEach((argument: Expression | SpreadElement) => {
           if ('name' in argument && argument.name) {
-            const globalKey = Object.keys(globals).find(key => globals[key] === argument.name);
-            addGlobalKey(globalKey);
+            addGlobalKey(getGlobalKey(argument.name));
           }
         });
       }
@@ -134,10 +158,13 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
           ? options.dependencies
           : []),
     ];
+    scanningFile = module.fileName;
 
     // Add dependencies based on externals/imports we've found inside the file
     if (options.includeGlobals) {
+      log(`---- Scanning "${scanningFile}" for globals`);
       findGlobalsUsage(module.code, globals).forEach(dependency => {
+        log(`Found: "${dependency}"`);
         if (!dependencies.includes(dependency)) {
           dependencies.push(dependency);
         }
@@ -237,6 +264,15 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
   return {
     name: VITE_PLUGIN_NAME,
     enforce: 'post',
+
+    /**
+     * Get Resolved Config.
+     *
+     * @param c
+     */
+    configResolved(c) {
+      rootConfig = c;
+    },
 
     /**
      * Generate Bundle Hook.
