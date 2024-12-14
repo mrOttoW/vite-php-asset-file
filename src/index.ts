@@ -184,7 +184,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
     if (module.viteMetadata && module.viteMetadata.importedCss) {
       module.viteMetadata.importedCss.forEach(function (filePath) {
         if (options.cssExtensions.some(ext => filePath.endsWith(ext))) {
-          const fileName = path.basename(filePath, path.extname(filePath));
+          const fileName = path.basename(filePath, path.extname(filePath)).replace(/(\.[a-zA-Z0-9]+)(?=\.\w+$|$)/, '');
           const prefixedFileName = options.cssNamePrefix ? `${options.cssNamePrefix}-${fileName}` : fileName;
           assets[prefixedFileName] = filePath;
         }
@@ -209,20 +209,6 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
     }
 
     return hash.digest('hex').slice(0, options.hashMaxLength);
-  };
-
-  /**
-   * Create PHP asset file name.
-   *
-   * @param filename
-   */
-  const createPhpAssetFileName = (filename: string) => {
-    for (const ext of options.jsExtensions) {
-      if (filename.endsWith(ext)) {
-        return filename.slice(0, -ext.length) + '.asset.php';
-      }
-    }
-    throw new Error(`VitePhpAssetFile: No matching extension found for file: ${filename}`);
   };
 
   /**
@@ -253,7 +239,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
 
     plugin.emitFile({
       type: 'asset',
-      fileName: createPhpAssetFileName(module.fileName),
+      fileName: `${module.name}.asset.php`,
       source: '<?php return ' + phpPrinter({ dependencies, version, assets }) + ';',
     });
   };

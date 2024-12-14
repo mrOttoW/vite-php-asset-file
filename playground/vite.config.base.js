@@ -1,6 +1,7 @@
 import path from 'path';
 import { ViteWordPress } from 'vite-wordpress';
 
+const manifestEnv = process.env.MANIFEST;
 const environment = process.env.ENVIRONMENT;
 
 const globals = {
@@ -19,9 +20,11 @@ const config = {
 };
 
 if (environment === 'wordpress') {
+  /** Run with ``ENVIRONMENT=wordpress yarn playground-build``*/
   config.plugins.push(
     ViteWordPress({
       preserveDirs: false,
+      manifest: !!manifestEnv,
       input: [
         'wordpress-environment/main.js',
         'wordpress-environment/blocks/example-block/index.js',
@@ -32,9 +35,15 @@ if (environment === 'wordpress') {
       ],
     })
   );
+
+  /**
+   *
+   */
 } else {
+  /** Run with ``yarn playground-build``*/
   config.build = {
     outDir: 'build',
+    manifest: !!manifestEnv,
     rollupOptions: {
       input: {
         'jquery-bundle': path.resolve(__dirname, 'src', 'general-environment', 'jquery', 'my-jquery-bundle.js'),
@@ -43,8 +52,8 @@ if (environment === 'wordpress') {
         'wp-block-bundle': path.resolve(__dirname, 'src', 'general-environment', 'blocks', 'my-wp-block-bundle.jsx'),
       },
       output: {
-        entryFileNames: ({ name }) => `${name}.js`,
-        assetFileNames: '[name][extname]',
+        entryFileNames: ({ name }) => (!!manifestEnv === false ? `${name}.js` : `${name}.[hash].js`),
+        assetFileNames: !!manifestEnv === false ? '[name][extname]' : '[name].[hash][extname]',
         globals,
       },
       external: Object.keys(globals),
