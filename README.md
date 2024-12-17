@@ -7,6 +7,7 @@
 A simple Vite plugin to produce a php file that returns an array with hash of each build to 'version' your asset files for cache-busting, a dependency list derived from globals and a list of imported
 CSS assets. This serves as an alternative to using a manifest file in a PHP environment.
 </p>
+  <img alt="NPM Downloads" src="https://img.shields.io/npm/d18m/vite-php-asset-file">
   <img src="https://img.shields.io/github/v/release/mrOttoW/vite-php-asset-file" alt="GitHub release" />
   <img src="https://img.shields.io/npm/dependency-version/vite-php-asset-file/peer/vite" alt="npm peer dependency version" />
   <img alt="Node Current" src="https://img.shields.io/node/v/vite-php-asset-file">
