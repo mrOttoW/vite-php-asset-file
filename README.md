@@ -62,6 +62,7 @@ export default {
       indent: '  ',
       shortArraySyntax: true,
       includeGlobals: true,
+      dependencies: (module, deps) => deps,
       jsExtensions: ['.js', '.ts'],
       cssExtensions: ['.css', '.scss'],
       cssNamePrefix: 'my-plugin',
@@ -78,20 +79,20 @@ export default {
 
 The following options are available to configure the plugin:
 
-| Option             | Type                             | Default Value                                  | Description                                                                                                   |
-| ------------------ | -------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `linebreak`        | `string`                         | `''`                                           | Defines the line break character for the PHP output.                                                          |
-| `indent`           | `string`                         | `''`                                           | Defines the indentation style for the PHP output.                                                             |
-| `shortArraySyntax` | `boolean`                        | `false`                                        | If `true`, uses PHP short array syntax `[]` instead of `array()`.                                             |
-| `includeGlobals`   | `boolean`                        | `true`                                         | If `true`, includes globally defined dependencies in the asset file (uses globals config from rollupOptions). |
-| `dependencies`     | `string[]` or `function(module)` | `[]`                                           | List of dependencies to include, or a function that returns dependencies based on module.                     |
-| `jsExtensions`     | `string[]`                       | `['.js', '.ts', '.jsx', '.tsx']`               | List of JavaScript file extensions to consider for generating PHP asset files.                                |
-| `cssExtensions`    | `string[]`                       | `['.css', '.pcss', '.scss', '.sass', '.less']` | List of CSS file extensions to consider for generating PHP asset files.                                       |
-| `cssNamePrefix`    | `string`                         | ``                                             | Set a prefix to imported CSS file names.                                                                      |
-| `includeCssAsDeps` | `boolean`                        | `false`                                        | If `true`, includes imported css file names as dependencies.                                                  |
-| `hashAlgorithm`    | `string`                         | `'sha256'`                                     | The hashing algorithm used to generate the version hash for each asset.                                       |
-| `hashMaxLength`    | `number`                         | `20`                                           | The maximum length of the generated hash.                                                                     |
-| `acornOptions`     | `AcornOptions`                   | `{ ecmaVersion: 2020, sourceType: 'module' }`  | Options for parsing JavaScript code with Acorn (used for finding global variable usage).                      |
+| Option             | Type                                   | Default Value                                  | Description                                                                                                   |
+| ------------------ | -------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `linebreak`        | `string`                               | `''`                                           | Defines the line break character for the PHP output.                                                          |
+| `indent`           | `string`                               | `''`                                           | Defines the indentation style for the PHP output.                                                             |
+| `shortArraySyntax` | `boolean`                              | `false`                                        | If `true`, uses PHP short array syntax `[]` instead of `array()`.                                             |
+| `includeGlobals`   | `boolean`                              | `true`                                         | If `true`, includes globally defined dependencies in the asset file (uses globals config from rollupOptions). |
+| `dependencies`     | `string[]` or `function(module, deps)` | `[]`                                           | List of dependencies to include, or a function that returns dependencies to filter deps based on module.      |
+| `jsExtensions`     | `string[]`                             | `['.js', '.ts', '.jsx', '.tsx']`               | List of JavaScript file extensions to consider for generating PHP asset files.                                |
+| `cssExtensions`    | `string[]`                             | `['.css', '.pcss', '.scss', '.sass', '.less']` | List of CSS file extensions to consider for generating PHP asset files.                                       |
+| `cssNamePrefix`    | `string`                               | ``                                             | Set a prefix to imported CSS file names.                                                                      |
+| `includeCssAsDeps` | `boolean`                              | `false`                                        | If `true`, includes imported css file names as dependencies.                                                  |
+| `hashAlgorithm`    | `string`                               | `'sha256'`                                     | The hashing algorithm used to generate the version hash for each asset.                                       |
+| `hashMaxLength`    | `number`                               | `20`                                           | The maximum length of the generated hash.                                                                     |
+| `acornOptions`     | `AcornOptions`                         | `{ ecmaVersion: 2020, sourceType: 'module' }`  | Options for parsing JavaScript code with Acorn (used for finding global variable usage).                      |
 
 ## How It Works
 

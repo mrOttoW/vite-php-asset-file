@@ -33,6 +33,9 @@ if (environment === 'wordpress') {
         'wordpress-environment/blocks/example-block/block.json',
         'wordpress-environment/blocks/example-block/style.pcss',
       ],
+      globals: {
+        '@elementor/ui': 'elementorV2.ui',
+      },
     })
   );
 
@@ -63,6 +66,9 @@ if (environment === 'wordpress') {
 
 const pluginOptions = {
   debug: true,
+  dependencies: (module, deps) => {
+    return deps.filter(dep => dep !== 'elementor-ui');
+  },
 };
 
 export { config, pluginOptions };

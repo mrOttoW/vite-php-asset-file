@@ -26,7 +26,7 @@ interface Options {
   indent?: string;
   shortArraySyntax?: boolean;
   includeGlobals?: boolean;
-  dependencies?: string[] | ((module: OutputChunk) => string[]); // eslint-disable-line no-unused-vars
+  dependencies?: string[] | ((module: OutputChunk, dependencies: string[]) => string[]); // eslint-disable-line no-unused-vars
   jsExtensions?: string[];
   cssExtensions?: string[];
   cssNamePrefix?: string;
@@ -151,13 +151,7 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
    * @param globals
    */
   const createDependencyArray = (module: OutputChunk, globals: GlobalsOption): string[] => {
-    const dependencies = [
-      ...(typeof options.dependencies === 'function'
-        ? options.dependencies(module)
-        : Array.isArray(options.dependencies)
-          ? options.dependencies
-          : []),
-    ];
+    const dependencies = [...(Array.isArray(options.dependencies) ? options.dependencies : [])];
     scanningFile = module.fileName;
 
     // Add dependencies based on externals/imports we've found inside the file
@@ -166,12 +160,17 @@ function VitePhpAssetFile(optionsParam: Options = {}): Plugin {
       findGlobalsUsage(module.code, globals).forEach(dependency => {
         log(`Found: "${dependency}"`);
         if (!dependencies.includes(dependency)) {
-          dependencies.push(dependency);
+          dependencies.push(
+            dependency
+              .replace(/([a-z0-9])([A-Z])/g, '$1-$2') // Convert camelCase to kebab-case
+              .replace(/@/g, '') // Remove @ signs
+              .replace(/[/]/g, '-') // Replace / with -
+          );
         }
       });
     }
 
-    return dependencies;
+    return typeof options.dependencies === 'function' ? options.dependencies(module, dependencies) : dependencies;
   };
 
   /**
